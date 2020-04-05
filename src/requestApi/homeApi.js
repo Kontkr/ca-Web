@@ -11,11 +11,11 @@ let ha = {
     //刪除我的任务消息
     deleteMyMt: data => Ajax.axios({ url: '/mplan/ca/mt/deletemymt', data, type: 'POST' }),
 
-    //查询所有的任务消息
-    queryAllMt: () => Ajax.axios({ url: '/mplan/ca/mt/queryallmt', type: 'POST' }),
+    //查询所有的任务消息 data为消息状态
+    queryAllMt: data => Ajax.axios({ url: '/mplan/ca/mt/queryallmt', data, type: 'POST' }),
 
-    //查询信息与评论
-    queryMC: data => Ajax.axios({ url: '/mplan/ca/mt/querymc', data, type: 'POST' }),
+    //查询评论
+    queryCvs: data => Ajax.axios({ url: '/mplan/ca/mt/querycvs', data, type: 'POST' }),
 
     //评论信息
     addComment: data => Ajax.axios({ url: '/mplan/ca/comment/add', data, type: 'POST' }),

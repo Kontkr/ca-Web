@@ -1,8 +1,7 @@
 import React from 'react';
 
-import { Upload, Modal, Input, Form, Button, Result } from 'antd';
+import { Upload, Modal, Input, Form, Button, Result, notification } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import { Ha } from '../../requestApi';
 import axios from 'axios';
 
 /**
@@ -76,13 +75,13 @@ export default class PicturesWall extends React.Component {
       } else {
         notification.error({
           description: '发布失败,请刷新重试！',
-          title: '提示'
+          message: '提示'
         })
       }
     }).catch(error =>
       notification.error({
         description: '发布失败,请刷新重试！',
-        title: '提示'
+        message: '提示'
       })
     )
   }
@@ -116,51 +115,51 @@ export default class PicturesWall extends React.Component {
     return (
       <div>
         {pageState ?
-          (<Form
-            ref={this.form}
-            onFinish={this.submitTask}
-          >
-
-            <Form.Item
-              name='message'
-              rules={[
-                { required: true, message: '不能为空！' },]}
+          (
+            <div style={{padding:20}}><Form
+              ref={this.form}
+              onFinish={this.submitTask}
             >
-              <Input.TextArea placeholder='说点什么吧...' />
-            </Form.Item>
+              <Form.Item
+                name='message'
+                rules={[
+                  { required: true, message: '不能为空！' },]}
+              >
+                <Input.TextArea placeholder='说点什么吧...' />
+              </Form.Item>
 
-            <Form.Item>
-              <div className="clearfix">
-                <Upload
-                  listType="picture-card"
-                  fileList={fileList}
-                  onPreview={this.handlePreview}//预览文件
-                  onChange={this.handleChange}
-                  // customRequest={this.customRequest}
-                  beforeUpload={this.beforeUpload}
-                >
-                  {fileList.length >= 8 ? null : uploadButton}
-                </Upload>
-                <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel}>
-                  <img alt="example" style={{ width: '100%' }} src={previewImage} />
-                </Modal>
-              </div>
-            </Form.Item>
-            <Form.Item>
-              <Button type="primary" htmlType="submit">
-                提交
+              <Form.Item>
+                <div className="clearfix">
+                  <Upload
+                    listType="picture-card"
+                    fileList={fileList}
+                    onPreview={this.handlePreview}//预览文件
+                    onChange={this.handleChange}
+                    // customRequest={this.customRequest}
+                    beforeUpload={this.beforeUpload}
+                  >
+                    {fileList.length >= 8 ? null : uploadButton}
+                  </Upload>
+                  <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel}>
+                    <img alt="example" style={{ width: '100%' }} src={previewImage} />
+                  </Modal>
+                </div>
+              </Form.Item>
+              <Form.Item>
+                <Button type="primary" htmlType="submit">
+                  提交
             </Button>
-            </Form.Item>
-          </Form>) : (<Result
-            status="success"
-            title='发布成功！'
-            extra={[
-              <Button type="primary" onClick={() => this.props.history.push('/home')}>
-                返回首页
+              </Form.Item>
+            </Form></div>) : (<Result
+              status="success"
+              title='发布成功！'
+              extra={[
+                <Button type="primary" onClick={() => this.props.history.push('/home')}>
+                  返回首页
               </Button>,
-              <Button onClick={this.clearAdd}>继续发布</Button>,
-            ]}
-          />
+                <Button onClick={this.clearAdd}>继续发布</Button>,
+              ]}
+            />
           )}
       </div>
     );

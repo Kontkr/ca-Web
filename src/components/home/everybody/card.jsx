@@ -1,12 +1,17 @@
 import React from 'react';
-import { Spin, Modal, notification, Button, Tabs, Empty, Card, Rate, Input } from 'antd';
-import { CommentOutlined } from '@ant-design/icons';
+import { Spin, Modal, notification, Button, Tabs, Empty, Card, Rate, Input, Avatar, Tooltip } from 'antd';
+import { CommentOutlined, DeleteOutlined } from '@ant-design/icons';
+import sessionStorage from 'store/storages/sessionStorage';
 import { Ha } from '../../../requestApi';
 import { isEmpty } from '../../../util/isEmpty';
-import sessionStorage from 'store/storages/sessionStorage';
 import AddCv from './addCv';
+import avatar from '../../../pubic/imag/avatar.jpg';
+import { Comment } from 'antd';
+import { Format } from '../../../util/DateUtil';
+import { WrapButton } from '../../../util/components/Wrap';
 
 const { TabPane } = Tabs;
+const user = JSON.parse(sessionStorage.read('user'));
 
 class McCard extends React.Component {
     constructor(props) {
@@ -20,14 +25,14 @@ class McCard extends React.Component {
         this.MtData = null;
         //信息id
         this.id = null;
+        this.addForm = React.createRef();
     }
 
     componentDidMount() {
-        this.initMt();
         this.initCvs();
     }
 
-    //初始化信息
+    //初始化消息
     initMt = () => {
         let MtData = JSON.parse(sessionStorage.read('currentMt'));
         this.MtData = MtData;
@@ -39,7 +44,7 @@ class McCard extends React.Component {
         this.setState({
             loading: true
         })
-        let resultData = await Ha.queryMC({ mtId: this.id });
+        let resultData = await Ha.queryCvs({ mtId: this.id });
         if (resultData && resultData.state === 'success') {
             this.setState({
                 Cvs: resultData.data,
@@ -61,6 +66,8 @@ class McCard extends React.Component {
 
     submitCv = async values => {
         const { Cvs } = this.state;
+        values['mt'] = this.id;
+        values['userId'] = user.id;
         let resultData = await Ha.addComment(values);
         if (resultData && resultData.state === 'success') {
             await this.initCvs();//重新查询评论
@@ -74,6 +81,7 @@ class McCard extends React.Component {
 
     //拼接 Mt jsx
     getMt = () => {
+        this.initMt();
         const mtData = this.MtData;
         return (
             <div>
@@ -81,15 +89,22 @@ class McCard extends React.Component {
                     style={{ width: '100%', marginBottom: 30 }}
                     size='small'
                     hoverable
+                    title={<div>
+                        <Avatar
+                            src={avatar}
+                            alt="Han Solo"
+                        />
+                        <span style={{ margin: 20 }}>{user.name}</span>
+                    </div>}
                     cover={
                         <div>
-                            <p style={{ margin: 20 }}>{mtData.message}</p>
+                            <p style={{ padding: 10, fontSize: 16 }}>{mtData.message}</p>
                             {
                                 isEmpty(mtData.pics) ? null : mtData.pics.map(e => {
                                     return (<img
                                         alt={e.title}
                                         src={e.path}
-                                        style={{ margin: 20, height: 200 }}
+                                        style={{ margin: 20, height: 150 }}
                                     />)
                                 })
                             }
@@ -101,37 +116,71 @@ class McCard extends React.Component {
         )
     }
 
+    showDelete = info => {
+        if (user.id === info.userId)
+            return (< Tooltip title='刪除评论' >
+                <WrapButton type='link' icon={<DeleteOutlined />} onClick={this.deleteCv} info={info} />
+            </Tooltip>);
+    }
+
+    //刪除评论
+    deleteCv = async (info, _) => {
+        this.setState({
+            loading: true
+        });
+        const commentId = info.info.id;
+        let resultData = await Ha.deleteComment({ commentId });
+        if (resultData && resultData.state === 'success') {
+            const newCvs = [...this.state.Cvs];
+            let index = newCvs.findIndex(e => e.id === commentId);
+            if (index > -1) {
+                newCvs.splice(index, 1);
+                this.setState({
+                    Cvs: newCvs,
+                    loading: false
+                }, () => notification.success({
+                    description: '刪除成功！',
+                    message: "提示",
+                }));
+            }
+        } else {
+            this.setState({
+                loading: false
+            }, () => notification.error({
+                description: '刪除失败！',
+                message: "提示",
+            }));
+        }
+    }
+
     //拼接 Cvs
     getCvs = () => {
         const { Cvs } = this.state;
         if (isEmpty(Cvs)) return <Empty />
+        let i = 0;
         let resultData = Cvs.map(e => (
             <div>
                 <Comment
-                    actions={actions}
-                    author={<a>e.userName</a>}
+                    actions={[<span>第{++i}楼</span>, this.showDelete(e)]}
+                    author={<a>{e.userName}</a>}
                     avatar={
                         <Avatar
-                            src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-                            alt="Han Solo"
+                            src={avatar}
                         />
                     }
                     content={
                         <div>
                             <div>
-                                <Rate disabled defaultValue={e.start} />
-                                <span>{commenTime}</span>
+                                <Rate disabled value={e.stars} />
                             </div>
-                            <p>
+                            <p style={{fontSize:16}}>
                                 {e.comment}
                             </p>
                         </div>
                     }
-                // datetime={
-                //     <Tooltip title={moment().format('YYYY-MM-DD HH:mm:ss')}>
-                //         <span>{moment().fromNow()}</span>
-                //     </Tooltip>
-                // }
+                    datetime={
+                        <span>{Format(new Date(e.commentTime))}</span>
+                    }
                 />
             </div>
         ));
@@ -143,32 +192,37 @@ class McCard extends React.Component {
         const { loading, Cvs } = this.state;
         return (
             <Spin size="large" tip="loding" spinning={loading}>
-                <Tabs>
-                    <TabPane
-                        tab={"详细"}
-                    >
-                        {isEmpty(data) ? <Empty /> : this.getMc()}
-                    </TabPane>
-                    <TabPane
-                        tab='评论区'
-                    >
-                        <div>
-                            <Button type="link"
-                                onClick={() => this.setState({ commentState: true })}
-                            >
-                                <div>
-                                    <Avatar
-                                        src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-                                        alt="Han Solo"
-                                    />
-                                    <Input placeholder='我也来说一句' style={{ marginRight: 30 }} />
+                <div style={{ padding: 20 }}>
+                    <Tabs>
+                        <TabPane
+                            tab={"详细"}
+                        >
+                            {this.getMt()}
+                        </TabPane>
+                    </Tabs>
+                    <Tabs>
+                        <TabPane
+                            tab='评论区'
+                        >
+                            <div>
+                                <Avatar
+                                    size='large'
+                                    src={avatar}
+                                />
+                                <Button type="link"
+                                    onClick={() => this.addForm.current.showModal()}
+                                >
+                                    <Input placeholder='我也来说一句' style={{ margin: 20 }} />
                                     <CommentOutlined />
+                                </Button>
+                                <div style={{ height: 200, overflow: 'auto' }}>
+                                    {isEmpty(Cvs) ? <Empty description='暂无评论' /> : this.getCvs()}
                                 </div>
-                            </Button>
-                        </div>
-                    </TabPane>
-                </Tabs>
-                <AddCv ref={this.addForm} submitCv={this.submitCv} />
+                            </div>
+                        </TabPane>
+                    </Tabs>
+                    <AddCv ref={this.addForm} submitCv={this.submitCv} />
+                </div>
             </Spin>
         );
     }

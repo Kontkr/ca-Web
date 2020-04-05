@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Layout, Spin, Form, Input, Button, notification } from 'antd';
+import sessionStorage from 'store/storages/sessionStorage';
 import './index.less';
 import { Lg } from '../requestApi';
 
@@ -17,7 +18,17 @@ class Login extends Component {
     onSubmit = async (values) => {
         let resultData = await Lg.login(values);
         if (resultData && resultData.state === 'success') {
-            this.props.history.replace('/home');
+            let user = resultData.data;
+            sessionStorage.write('user', JSON.stringify(user));
+            if (user.userType === 0)
+                this.props.history.replace('/admin');
+            else if (user.userType === 1)
+                this.props.history.replace('/home');
+            else
+                notification.error({
+                    description: '用户类型错误！',
+                    message: "提示",
+                })
         } else {
             notification.error({
                 description: resultData.data,

@@ -4,7 +4,7 @@ import {
     Input,
     Button,
     Spin,
-    Layout, notification,Result
+    Layout, notification, Result
 } from 'antd';
 import { Ua } from '../requestApi';
 
@@ -41,7 +41,7 @@ const tailFormItemLayout = {
     },
 };
 
-const RegistrationForm = () => {
+const RegistrationForm = props => {
     const [form] = Form.useForm();
     const [loading, setloading] = useState(false);
     const [pageStae, setPageSate] = useState(true);
@@ -180,7 +180,7 @@ const RegistrationForm = () => {
                                 status='success'
                                 title='注册成功！'
                                 extra={[
-                                    <Button type="primary" onClick={() => this.props.history.push('/')}>
+                                    <Button type="primary" onClick={() => props.history.push('/')}>
                                         登录
                                      </Button>,
                                     <Button onClick={() => setPageSate(true)}>继续注册</Button>,

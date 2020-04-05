@@ -40,14 +40,14 @@ class MySelf extends Component {
                 pageState: 1
             }, () => notification.success({
                 description: '查询成功！',
-                title: '提示'
+                message: '提示'
             }));
         } else {
             this.setState({
                 loading: false
             }, () => notification.error({
                 description: '查询失败！',
-                title: '提示'
+                message: '提示'
             }))
         }
     }
@@ -119,7 +119,7 @@ class MySelf extends Component {
                 loading: false
             }, () => notification.error({
                 description: '数据更新失败！',
-                title: '提示'
+                message: '提示'
             }));
         }
     }
@@ -188,14 +188,14 @@ class MySelf extends Component {
                 passWordState: false
             }, () => notification.success({
                 description: '密码更新成功！',
-                title: '提示'
+                message: '提示'
             }))
         } else {
             this.setState({
                 passWordState: false
             }, () => notification.success({
                 description: '密码更新失败！',
-                title: '提示'
+                message: '提示'
             }))
         }
     }
@@ -204,66 +204,68 @@ class MySelf extends Component {
         const { loading, pageState, passWordState } = this.state;
         return (
             <Spin size="large" tip="loding" spinning={loading} >
-                <Tabs>
-                    <TabPane
-                        tab='个人信息'
-                    >
-                        {pageState === 2 ? this.getMySelfForm() : pageState === 1 ? this.getMyself() : <Empty />}
-                    </TabPane>
-                </Tabs>
-                <Modal
-                    visible={passWordState}
-                    title='提示'
-                    cancelText='取消'
-                    closable
-                    okText='确认'
-                    onOk={this.submitPassWord}
-                    onCancel={() => { this.setState({ passWordState: false }) }}
-                >
-                    <Form
-                        ref={this.pwForm}
-                    // onFinish={this.submitPassWord}
-                    >
-                        <Form.Item
-                            name="passWord"
-                            label="密码"
-                            rules={[
-                                { required: true, message: '密码不能为空' },
-                                { min: 4, message: '密码名长度不能少于4位' },
-                                { max: 20, message: '密码名不能多余20位' },
-                            ]}
-                            hasFeedback
-                            {...formItemLayout}
+                <div style={{ padding: 20 }}>
+                    <Tabs>
+                        <TabPane
+                            tab='个人信息'
                         >
-                            <Input.Password />
-                        </Form.Item>
+                            {pageState === 2 ? this.getMySelfForm() : pageState === 1 ? this.getMyself() : <Empty />}
+                        </TabPane>
+                    </Tabs>
+                    <Modal
+                        visible={passWordState}
+                        title='提示'
+                        cancelText='取消'
+                        closable
+                        okText='确认'
+                        onOk={this.submitPassWord}
+                        onCancel={() => { this.setState({ passWordState: false }) }}
+                    >
+                        <Form
+                            ref={this.pwForm}
+                        // onFinish={this.submitPassWord}
+                        >
+                            <Form.Item
+                                name="passWord"
+                                label="密码"
+                                rules={[
+                                    { required: true, message: '密码不能为空' },
+                                    { min: 4, message: '密码名长度不能少于4位' },
+                                    { max: 20, message: '密码名不能多余20位' },
+                                ]}
+                                hasFeedback
+                                {...formItemLayout}
+                            >
+                                <Input.Password />
+                            </Form.Item>
 
-                        <Form.Item
-                            name="confirm"
-                            label="确认密码"
-                            dependencies={['passWord']}
-                            hasFeedback
-                            {...formItemLayout}
-                            rules={[
-                                {
-                                    required: true,
-                                    message: '请再次输入密码!',
-                                },
-                                ({ getFieldValue }) => ({
-                                    validator(rule, value) {
-                                        if (!value || getFieldValue('passWord') === value) {
-                                            return Promise.resolve();
-                                        }
-
-                                        return Promise.reject('两次输入的密码不一致!');
+                            <Form.Item
+                                name="confirm"
+                                label="确认密码"
+                                dependencies={['passWord']}
+                                hasFeedback
+                                {...formItemLayout}
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: '请再次输入密码!',
                                     },
-                                }),
-                            ]}
-                        >
-                            <Input.Password />
-                        </Form.Item>
-                    </Form>
-                </Modal>
+                                    ({ getFieldValue }) => ({
+                                        validator(rule, value) {
+                                            if (!value || getFieldValue('passWord') === value) {
+                                                return Promise.resolve();
+                                            }
+
+                                            return Promise.reject('两次输入的密码不一致!');
+                                        },
+                                    }),
+                                ]}
+                            >
+                                <Input.Password />
+                            </Form.Item>
+                        </Form>
+                    </Modal>
+                </div>
             </Spin>
         );
     }

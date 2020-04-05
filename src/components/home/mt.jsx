@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { Ha } from '../../requestApi';
 import { isEmpty } from '../../util/isEmpty';
-import { notification, Spin, Empty, Tabs, Card, Tooltip } from 'antd';
+import { notification, Spin, Empty, Tabs, Card, Tooltip, Modal, Avatar } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import { WrapButton } from '../../util/components/Wrap';
-import { Modal } from 'antd';
+import avatar from '../../pubic/imag/avatar.jpg';
 
 /**
  * 查看审核中与审核不通过的数据
@@ -59,8 +59,8 @@ export default class Mt extends Component {
     }
 
     //刪除mt
-    deleteMt(mtId) {
-        this.currentDeleteMtId = mtId;
+    deleteMt(props, _) {
+        this.currentDeleteMtId = props.id;
         this.setState({
             deleteState: true,
         })
@@ -113,31 +113,44 @@ export default class Mt extends Component {
 
     getMt = () => {
         const { data } = this.state;
-        let resultData = data.map(item => {
+        let resultData = data.map((item, index) => {
             return (
-                <Card
-                    style={{ width: '100%', marginBottom: 30 }}
-                    size='small'
-                    extra={(
-                        <Tooltip title='刪除' >
-                            <WrapButton id={item.id} onClick={this.deleteMt} icon={<DeleteOutlined />} />
-                        </Tooltip>)}
-                    cover={
-                        <div>
-                            <div style={{ marginBottom: 20, paddingLeft: 20 }}>{item.message}</div>
-                            {
-                                isEmpty(item.pics) ? null : item.pics.map(e => {
-                                    return (<img
-                                        alt={e.title}
-                                        src={e.path}
-                                        style={{ margin: 20, height: 200 }}
-                                    />)
-                                })
-                            }
-                        </div>
-                    }
-                >
-                </Card>
+                <div>
+                    {index === 0 ? null : <div style={{ height: 30, backgroundColor: '#efefef' }}></div>}
+                    <Card
+                        style={{ width: '100%', height: '100%' }}
+                        size='small'
+                        hoverable
+                        extra={(
+                            <Tooltip title='刪除' >
+                                <WrapButton id={item.id} onClick={this.deleteMt} icon={<DeleteOutlined />} />
+                            </Tooltip>)}
+                        title={<div>
+                            <Avatar
+                                size='large'
+                                src={avatar}
+                            />
+                            <span style={{ margin: 20 }}>{item.userName}</span>
+                        </div>}
+                        cover={
+                            <div>
+                                <div style={{ padding: 10, fontSize: 16 }}>{item.message}</div>
+                                {
+                                    isEmpty(item.pics) ? null : item.pics.map(e => {
+                                        return (<img
+                                            alt={e.title}
+                                            src={e.path}
+                                            style={{ margin: 20, height: 150 }}
+                                        />)
+                                    })
+                                }
+                            </div>
+                        }
+                    >
+                    </Card>
+                    {/* 站位 */}
+
+                </div>
             )
         });
         return resultData;
@@ -146,7 +159,7 @@ export default class Mt extends Component {
     compare = () => {
         if (this.originState !== this.props.taskState) {
             this.originState = this.props.taskState;
-             this.initData();
+            this.initData();
         }
     }
 
@@ -156,24 +169,28 @@ export default class Mt extends Component {
         this.compare();
         return (
             <Spin size="large" tip="loding" spinning={loading}>
-                <Tabs>
-                    <TabPane
-                        tab={message}
+                <div style={{ padding: 20 }}>
+                    <Tabs>
+                        <TabPane
+                            tab={message}
+                        >
+                            <div styel={{ height: 200, overflow: 'auto' }}>
+                                {isEmpty(data) ? <Empty /> : this.getMt()}
+                            </div>
+                        </TabPane>
+                    </Tabs>
+                    <Modal
+                        visible={deleteState}
+                        title='提示'
+                        cancelText='取消'
+                        closable
+                        okText='确认'
+                        onOk={this.deleteOkHandler}
+                        onCancel={() => { this.setState({ deleteState: false }) }}
                     >
-                        {isEmpty(data) ? <Empty /> : this.getMt()}
-                    </TabPane>
-                </Tabs>
-                <Modal
-                    visible={deleteState}
-                    title='提示'
-                    cancelText='取消'
-                    closable
-                    okText='确认'
-                    onOk={this.deleteOkHandler}
-                    onCancel={() => { this.setState({ deleteState: false }) }}
-                >
-                    是否刪除此条{message}的记录?
+                        是否刪除此条{message}的记录?
             </Modal>
+                </div>
             </Spin>
         )
     }

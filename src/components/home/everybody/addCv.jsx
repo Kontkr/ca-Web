@@ -32,6 +32,7 @@ class AddCv extends Component {
     }
 
     render() {
+        const { commentState } = this.state;
         return (
             <Modal
                 visible={commentState}
@@ -42,9 +43,11 @@ class AddCv extends Component {
                 onOk={this.submitCv}
                 onCancel={() => { this.setState({ commentState: false }) }}
             >
-                <Form>
+                <Form
+                    ref={this.form}
+                >
                     <Form.Item
-                        name='start'
+                        name='stars'
                         label='评分'
                         initialValues={{ start: 3.5 }}
                     >

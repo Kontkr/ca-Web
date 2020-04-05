@@ -8,7 +8,6 @@
     "dev": "webpack-dev-server  --config ./webpack.dev.config.js",
     "build": "webpack --config ./webpack.dev.config.js",
     "dll": "webpack --config ./webpack.dll.config.js"
-
   },
   "keywords": [],
   "author": "",
@@ -40,6 +39,7 @@
     "react": "^16.10.2",
     "react-dom": "^16.10.2",
     "react-router": "^5.1.2",
-    "react-router-dom": "^5.1.2"
+    "react-router-dom": "^5.1.2",
+    "store": "^2.0.12"
   }
 }

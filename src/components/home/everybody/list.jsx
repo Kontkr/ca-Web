@@ -1,10 +1,13 @@
 import React from 'react';
-import { Spin, Modal, notification, Button, Tabs, Empty, Card } from 'antd';
+import { Spin, Modal, notification, Button, Tabs, Empty, Card, Avatar } from 'antd';
 import { CommentOutlined } from '@ant-design/icons';
+import sessionStorage from 'store/storages/sessionStorage';
 import { Ha } from '../../../requestApi';
 import { isEmpty } from '../../../util/isEmpty';
+import avatar from '../../../pubic/imag/avatar.jpg';
 
 const { TabPane } = Tabs;
+const user = JSON.parse(sessionStorage.read('user'));
 
 class List extends React.Component {
     constructor(props) {
@@ -25,7 +28,7 @@ class List extends React.Component {
         this.setState({
             loading: true
         })
-        let resultData = await Ha.queryAllMt();
+        let resultData = await Ha.queryAllMt({ taskState: '1' });
         if (resultData && resultData.state === 'success') {
             this.setState({
                 data: resultData.data,
@@ -48,35 +51,51 @@ class List extends React.Component {
 
     getAllMessage = () => {
         const { data } = this.state;
-        let resultData = data.map(item => {
+        let resultData = data.map((item, index) => {
             return (
-                <Card
-                    style={{ width: '100%', marginBottom: 30 }}
-                    size='small'
-                    hoverable
-                    cover={
-                        <div>
-                            <div style={{ marginBottom: 20, paddingLeft: 20 }}>{item.message}</div>
-                            {
-                                isEmpty(item.pics) ? null : item.pics.map(e => {
-                                    return (<img
-                                        alt={e.title}
-                                        src={e.path}
-                                        style={{ margin: 20, height: 200 }}
-                                    />)
-                                })
-                            }
-                        </div>
-                    }
-                    actions={[
-                        <span>
-                            <Button type="link" icon={<CommentOutlined />}
-                                onClick={() => this.props.history.push('/home/allMt/card?id=' + item.id)} />
-                            42
+                <div>
+                    {index === 0 ? null : <div style={{ height: 30, backgroundColor: '#efefef' }}></div>}
+                    <Card
+                        style={{ width: '100%', marginBottom: 30 }}
+                        size='small'
+                        hoverable
+                        title={<div>
+                            <Avatar
+                                size='large'
+                                src={avatar}
+                            />
+                            <span style={{ margin: 20 }}>{item.userName}</span>
+                        </div>}
+                        cover={
+                            < div >
+                                <div style={{ padding: 10, fontSize: 16 }}>{item.message}</div>
+                                {
+                                    isEmpty(item.pics) ? null : item.pics.map(e => {
+                                        return (<img
+                                            alt={e.title}
+                                            src={e.path}
+                                            style={{ margin: 20, height: 100 }}
+                                        />)
+                                    })
+                                }
+                            </div >
+                        }
+                        actions={
+                            [
+                                <span>
+                                    <Button type="link" icon={<CommentOutlined />}
+                                        onClick={() => {
+                                            let curretnMt = JSON.stringify(item);
+                                            sessionStorage.write('currentMt', curretnMt);
+                                            this.props.history.push('/home/allMt/card?requireTime=' + Date.parse(new Date()))
+                                        }
+                                        } />
+                                    42
                         </span>,
-                    ]}
-                >
-                </Card>
+                            ]}
+                    >
+                    </Card>
+                </div>
             )
         });
         return resultData;
@@ -86,24 +105,15 @@ class List extends React.Component {
         const { loading, data, deleteState } = this.state;
         return (
             <Spin size="large" tip="loding" spinning={loading}>
-                <Tabs>
-                    <TabPane
-                        tab={"大家说"}
-                    >
-                        {isEmpty(data) ? <Empty /> : this.getAllMessage()}
-                    </TabPane>
-                </Tabs>
-                <Modal
-                    visible={deleteState}
-                    title='提示'
-                    cancelText='取消'
-                    closable
-                    okText='确认'
-                    // onOk={this.deleteOkHandler}
-                    onCancel={() => { this.setState({ deleteState: false }) }}
-                >
-                    是否刪除此条记录?
-        </Modal>
+                <div style={{ padding: 20 }}>
+                    <Tabs>
+                        <TabPane
+                            tab={"大家说"}
+                        >
+                            {isEmpty(data) ? <Empty /> : this.getAllMessage()}
+                        </TabPane>
+                    </Tabs>
+                </div>
             </Spin>
         );
     }
