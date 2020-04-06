@@ -11,7 +11,7 @@ import { Format } from '../../../util/DateUtil';
 import { WrapButton } from '../../../util/components/Wrap';
 
 const { TabPane } = Tabs;
-const user = JSON.parse(sessionStorage.read('user'));
+
 
 class McCard extends React.Component {
     constructor(props) {
@@ -26,6 +26,7 @@ class McCard extends React.Component {
         //信息id
         this.id = null;
         this.addForm = React.createRef();
+        this.user = JSON.parse(sessionStorage.read('user'));
     }
 
     componentDidMount() {
@@ -67,7 +68,7 @@ class McCard extends React.Component {
     submitCv = async values => {
         const { Cvs } = this.state;
         values['mt'] = this.id;
-        values['userId'] = user.id;
+        values['userId'] = this.user.id;
         let resultData = await Ha.addComment(values);
         if (resultData && resultData.state === 'success') {
             await this.initCvs();//重新查询评论
@@ -77,6 +78,10 @@ class McCard extends React.Component {
                 message: "提示",
             });
         }
+    }
+    //返回列表
+    backList = e => {
+        this.props.history.push('/home/allmt');
     }
 
     //拼接 Mt jsx
@@ -89,12 +94,13 @@ class McCard extends React.Component {
                     style={{ width: '100%', marginBottom: 30 }}
                     size='small'
                     hoverable
+                    extra={<Button onClick={this.backList}>返回列表</Button>}
                     title={<div>
                         <Avatar
                             src={avatar}
                             alt="Han Solo"
                         />
-                        <span style={{ margin: 20 }}>{user.name}</span>
+                        <span style={{ margin: 20 }}>{mtData.userName}</span>
                     </div>}
                     cover={
                         <div>
@@ -117,7 +123,7 @@ class McCard extends React.Component {
     }
 
     showDelete = info => {
-        if (user.id === info.userId)
+        if (this.user.id === info.userId)
             return (< Tooltip title='刪除评论' >
                 <WrapButton type='link' icon={<DeleteOutlined />} onClick={this.deleteCv} info={info} />
             </Tooltip>);
@@ -173,7 +179,7 @@ class McCard extends React.Component {
                             <div>
                                 <Rate disabled value={e.stars} />
                             </div>
-                            <p style={{fontSize:16}}>
+                            <p style={{ fontSize: 16 }}>
                                 {e.comment}
                             </p>
                         </div>
@@ -215,7 +221,7 @@ class McCard extends React.Component {
                                     <Input placeholder='我也来说一句' style={{ margin: 20 }} />
                                     <CommentOutlined />
                                 </Button>
-                                <div style={{ height: 200, overflow: 'auto' }}>
+                                <div style={{/* height: 200, overflow: 'auto'*/ }}>
                                     {isEmpty(Cvs) ? <Empty description='暂无评论' /> : this.getCvs()}
                                 </div>
                             </div>

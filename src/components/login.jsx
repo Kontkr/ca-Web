@@ -3,6 +3,7 @@ import { Layout, Spin, Form, Input, Button, notification } from 'antd';
 import sessionStorage from 'store/storages/sessionStorage';
 import './index.less';
 import { Lg } from '../requestApi';
+import desk from '../pubic/imag/avatar.jpg';
 
 const { Header, Content } = Layout;
 
@@ -53,9 +54,9 @@ class Login extends Component {
         const { loading } = this.state;
         return (
             <Spin size="large" tip="loding" spinning={loading}>
-                <Layout className="login-layout">
-                    <Header className='login-header'>
-                    </Header>
+                <Layout className="login-layout" >
+                    {/* <Header className='login-header'>
+                    </Header> */}
                     <Content className='login-content'>
                         <Form
                             {...layout}

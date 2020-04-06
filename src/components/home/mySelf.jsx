@@ -3,6 +3,7 @@ import { notification, Spin, Empty, Tabs, Form, List, Button, Modal, Input } fro
 import { Ua } from '../../requestApi';
 import { isEmpty } from '../../util/isEmpty';
 import { formItemLayout } from '../../util/formStyle';
+import { Format} from '../../util/DateUtil'
 
 const { TabPane } = Tabs;
 
@@ -133,6 +134,14 @@ class MySelf extends Component {
             padding: 2,
         };
         let resultData = [];
+        //处理时间格式
+        if(!isEmpty(this.data['modifyTime'])) {
+            let modifyTime = Format(new Date(this.data['modifyTime']));
+            this.data['modifyTime'] = modifyTime;
+        }
+        let createTime = Format(new Date(this.data['createTime']));
+        this.data['createTime'] = createTime;
+        //end
         for (let attribute of Object.keys(this.data)) {
             if (attribute === 'passWord' || attribute === 'id')
                 continue;

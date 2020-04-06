@@ -26,15 +26,17 @@ const Home = () => {
         首页
     </div>);
 }
-
-const user = JSON.parse(sessionStorage.read('user'));
-
+ 
 export default class SiderDemo extends React.Component {
 
-    state = {
-        collapsed: false,
-        loading: false
-    };
+    constructor(props){
+        super(props);
+        this.state = {
+            collapsed: false,
+            loading: false
+        };
+        this.user = JSON.parse(sessionStorage.read('user'));
+    }
 
     onCollapse = collapsed => {
         console.log(collapsed);
@@ -124,7 +126,7 @@ export default class SiderDemo extends React.Component {
                                     src={avatar}
                                     alt="Han Solo"
                                 />
-                                <span style={{ margin: '20' }}>{user.name}</span>
+                                <span style={{ margin: '20' }}>{this.user.name}</span>
                                 <Tooltip title='注销' >
                                     <Button type='link' onClick={this.logout} icon={<LogoutOutlined />} />
                                 </Tooltip>

@@ -11,7 +11,7 @@ import {
     HomeOutlined
 } from '@ant-design/icons';
 import { HashRouter, BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
-import { Aa, Ha } from '../../requestApi';
+import { Aa, Ha, Lg } from '../../requestApi';
 import { WrapButton } from '../../util/components/Wrap';
 import { isEmpty } from '../../util/isEmpty';
 import avatar from '../../pubic/imag/avatar.jpg'
@@ -273,19 +273,25 @@ class Approval extends Component {
     }
 }
 
-const user = JSON.parse(sessionStorage.read('user'));
 
 export default class Admin extends Component {
-    state = {
-        collapsed: false,
-        loading: false
-    };
+
+
+
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            collapsed: false,
+            loading: false
+        };
+        this.user = JSON.parse(sessionStorage.read('user'));
+    }
 
     onCollapse = collapsed => {
         console.log(collapsed);
         this.setState({ collapsed });
     };
-
     //注销事件
     logout = async e => {
         let resultData = await Lg.logout();
@@ -332,7 +338,7 @@ export default class Admin extends Component {
                                     src={avatar}
                                     alt="Han Solo"
                                 />
-                                <span style={{ margin: '20' }}>{user.name}</span>
+                                <span style={{ margin: '20' }}>{this.user.name}</span>
                                 <Tooltip title='注销' >
                                     <Button type='link' onClick={this.logout} icon={<LogoutOutlined />} />
                                 </Tooltip>

@@ -1,18 +1,22 @@
 .login-layout {
-    .login-header {
-        background-color: #ffffff;
-        width           : 100%;
-        flex            : 0 0 44px;
-    }
+    background-image: url(../pubic/imag/avatar.jpg);
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    height: 100%;
+    // .login-header {
+    //     background-color: #ffffff;
+    //     width           : 100%;
+    //     flex            : 0 0 44px;
+    // }
 
     .login-content {
         width : 100%;
         height: 80%;
-
+        text-align: center;
         .login-form {
             width           : 400px;
             height          : 300px;
-            background-color: #efefef;
+            background-color: transparent;
             margin          : 50px auto;
             padding         : 30px;
 
@@ -41,5 +45,13 @@
         background-color: #efefef;
         margin          : 50px auto;
         padding         : 30px;
+    }
+}
+
+.ant-spin-nested-loading {
+    height: 100%;
+
+    .ant-spin-container {
+        height: 100%;
     }
 }
